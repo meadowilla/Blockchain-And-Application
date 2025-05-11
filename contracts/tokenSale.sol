@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./Token.sol";
 import "hardhat/console.sol";
 
-contract tokenSale is Ownable {
+contract TokenSale {
     Token public token;
     uint256 public SALE_DURATION = 30 days;
     uint256 public startTime;
@@ -13,7 +13,7 @@ contract tokenSale is Ownable {
 
     event TokensPurchased(address indexed buyer, uint256 amount, uint256 price);
     
-    constructor(address _tokenAddress, uint256 _totalSupply) Ownable(msg.sender) {
+    constructor(address _tokenAddress, uint256 _totalSupply) {
         token = Token(_tokenAddress);
         totalSupply = _totalSupply;
         startTime = block.timestamp;
@@ -27,7 +27,7 @@ contract tokenSale is Ownable {
         require(msg.value >= price, "Insufficient ETH sent");
 
         tokensSold += amountTokens;
-        token.transfer(msg.sender, amountTokens);
+        token.transferFrom(token.owner(), msg.sender, amountTokens);
 
         emit TokensPurchased(msg.sender, amountTokens, price);
     }
@@ -37,9 +37,9 @@ contract tokenSale is Ownable {
         uint256 price;
 
         if (tokensSold + amountTokens <= firstTime) {
-            price = amountTokens * 5 ether;
+            price = amountTokens * 5;
         } else {
-            price = amountTokens * 10 ether;
+            price = amountTokens * 10;
         }
         return price;
     }
